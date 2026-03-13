@@ -43,11 +43,13 @@ jobs:
 
       - name: Ensure assets directory exists
         run: |
-          mkdir -p assets/cards assets/sounds
+          mkdir -p assets/cards
+          mkdir -p assets/sounds
 
       - name: Build on Windows
         if: matrix.os == 'windows-latest'
         run: |
+          New-Item -ItemType Directory -Force -Path assets/cards,assets/sounds
           pyinstaller --onefile --name doudizhu --add-data "assets;assets" --console main.py
 
       - name: Build on Linux
