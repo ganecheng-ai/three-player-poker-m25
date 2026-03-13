@@ -122,6 +122,6 @@ jobs:
             artifacts/doudizhu-macos.tar.gz
             artifacts/checksums.txt
           generate_release_notes: true
-          overwrite: true
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
