@@ -16,12 +16,15 @@ jobs:
           - os: windows-latest
             artifact_name: doudizhu-windows
             ext: .exe
+            packaging: zip
           - os: ubuntu-latest
             artifact_name: doudizhu-linux
             ext: ''
+            packaging: tar.gz
           - os: macos-latest
             artifact_name: doudizhu-macos
             ext: ''
+            packaging: tar.gz
 
     runs-on: ${{ matrix.os }}
 
@@ -42,7 +45,6 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           pyinstaller --onefile --name doudizhu --add-data "assets;assets" --console main.py
-        shell: bash
 
       - name: Build on Linux
         if: matrix.os == 'ubuntu-latest'
@@ -56,14 +58,35 @@ jobs:
           pip install pygame
           pyinstaller --onefile --name doudizhu --add-data "assets:assets" --console main.py
 
+      - name: Package Windows
+        if: matrix.os == 'windows-latest'
+        working-directory: dist
+        shell: powershell
+        run: |
+          Compress-Archive -Path doudizhu.exe -DestinationPath doudizhu-windows.zip
+          mv doudizhu-windows.zip ../
+
+      - name: Package Linux
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: dist
+        run: |
+          tar -czvf doudizhu-linux.tar.gz doudizhu
+          mv doudizhu-linux.tar.gz ../
+
+      - name: Package macOS
+        if: matrix.os == 'macos-latest'
+        working-directory: dist
+        run: |
+          tar -czvf doudizhu-macos.tar.gz doudizhu
+          mv doudizhu-macos.tar.gz ../
+
       - name: Create artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            dist/doudizhu${{ matrix.ext }}
-            dist/*.dylib  # macOS相关
-            dist/*.so     # Linux相关
+            doudizhu*
+            !doudizhu
           retention-days: 5
 
   release:
@@ -77,8 +100,8 @@ jobs:
           path: artifacts
 
       - name: Create checksums
+        working-directory: artifacts
         run: |
-          cd artifacts
           find . -type f -exec sha256sum {} \; > checksums.txt
 
       - name: Create Release

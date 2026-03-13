@@ -37,9 +37,9 @@ git push origin v1.0.0
 ```
 
 构建产物包括：
-- Windows: `.exe`
-- macOS: `.app` / `.dylib`
-- Linux: 可执行文件
+- Windows: `.exe` / `.zip`
+- macOS: `.tar.gz`
+- Linux: `.tar.gz`
 - 包含 SHA256 校验和文件 `checksums.txt`
 
 ## 项目结构
