@@ -89,8 +89,10 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            doudizhu*
-            !doudizhu
+            doudizhu*.exe
+            doudizhu
+            doudizhu*.tar.gz
+            doudizhu*.zip
           retention-days: 5
 
   release:
