@@ -122,8 +122,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            doudizhu*.zip
-            doudizhu*.tar.gz
+            artifacts/doudizhu*.zip
+            artifacts/doudizhu*.tar.gz
             checksums.txt
           overwrite_files: true
         env:
