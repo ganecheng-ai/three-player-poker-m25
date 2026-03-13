@@ -84,6 +84,11 @@ jobs:
           tar -czvf doudizhu-macos.tar.gz doudizhu
           mv doudizhu-macos.tar.gz ../
 
+      - name: Clean up build artifacts
+        run: |
+          rm -f *.log *.spec
+          rm -rf build dist __pycache__
+
       - name: Create artifact
         uses: actions/upload-artifact@v4
         with:
