@@ -119,12 +119,16 @@ jobs:
           find . -type f -exec sha256sum {} \; > checksums.txt
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@v1
         with:
-          files: |
+          artifacts: |
             artifacts/doudizhu*.zip
             artifacts/doudizhu*.tar.gz
+          artifactsIgnore: |
             checksums.txt
-          overwrite_files: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          checksumFiles: |
+            artifacts/**
+          allowUpdates: true
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
