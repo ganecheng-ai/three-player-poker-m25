@@ -5,8 +5,8 @@ import logging
 import os
 from datetime import datetime
 
-# 日志目录
-LOG_DIR = os.path.dirname(os.path.abspath(__file__))
+# 日志目录 - 保存在程序运行目录(项目根目录)
+LOG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_FILE = os.path.join(LOG_DIR, f'doudizhu_{datetime.now().strftime("%Y%m%d")}.log')
 
 
