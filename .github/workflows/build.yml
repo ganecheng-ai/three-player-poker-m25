@@ -68,7 +68,7 @@ jobs:
         shell: powershell
         run: |
           Compress-Archive -Path doudizhu.exe -DestinationPath doudizhu-windows.zip
-          mv doudizhu-windows.zip ../
+          Move-Item doudizhu-windows.zip ../
 
       - name: Package Linux
         if: matrix.os == 'ubuntu-latest'
@@ -86,8 +86,17 @@ jobs:
 
       - name: Clean up build artifacts
         run: |
-          rm -f *.log *.spec
-          rm -rf build dist __pycache__
+          python -c "
+import os
+import shutil
+import glob
+for f in ['*.log', '*.spec']:
+    for p in glob.glob(f):
+        try: os.remove(p)
+        except: pass
+for d in ['build', 'dist', '__pycache__']:
+    try: shutil.rmtree(d)
+    except: pass"
 
       - name: Create artifact
         uses: actions/upload-artifact@v4
