@@ -43,7 +43,7 @@ jobs:
 
       - name: Ensure assets directory exists
         run: |
-          mkdir -p assets/cards assets/sounds
+          python -c "import os; os.makedirs('assets/cards', exist_ok=True); os.makedirs('assets/sounds', exist_ok=True)"
 
       - name: Build on Windows
         if: matrix.os == 'windows-latest'
