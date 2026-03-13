@@ -85,18 +85,7 @@ jobs:
           mv doudizhu-macos.tar.gz ../
 
       - name: Clean up build artifacts
-        run: |
-          python -c "
-import os
-import shutil
-import glob
-for f in ['*.log', '*.spec']:
-    for p in glob.glob(f):
-        try: os.remove(p)
-        except: pass
-for d in ['build', 'dist', '__pycache__']:
-    try: shutil.rmtree(d)
-    except: pass"
+        run: python -c "import os, shutil, glob; [os.remove(p) for f in ['*.log', '*.spec'] for p in glob.glob(f) if os.path.exists(p)]; [shutil.rmtree(d) for d in ['build', 'dist', '__pycache__'] if os.path.exists(d)]"
 
       - name: Create artifact
         uses: actions/upload-artifact@v4
