@@ -7,7 +7,7 @@ from config import (
     COLOR_WHITE, COLOR_BLACK, COLOR_BUTTON, COLOR_BUTTON_HOVER,
     SCREEN_WIDTH, SCREEN_HEIGHT, CARD_WIDTH, CARD_HEIGHT
 )
-from game.card import Card
+from game.card import Card, Suit
 from ui.resources import resources
 
 
@@ -102,7 +102,7 @@ class CardWidget:
             screen.blit(rank_surf_r, (self.x + CARD_WIDTH - 25, card_y + CARD_HEIGHT - 25))
 
             # 中心花色
-            if self.card.suit != Card.Suit.JOKER:
+            if self.card.suit != Suit.JOKER:
                 center_suit = resources.font_large.render(suit_text, True, self.card.color)
                 center_rect = center_suit.get_rect(center=(self.x + CARD_WIDTH//2, card_y + CARD_HEIGHT//2))
                 screen.blit(center_suit, center_rect)

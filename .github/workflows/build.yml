@@ -48,19 +48,19 @@ jobs:
       - name: Build on Windows
         if: matrix.os == 'windows-latest'
         run: |
-          pyinstaller --onefile --name doudizhu --add-data "assets;assets" --console main.py
+          pyinstaller --onefile --name doudizhu --add-data "assets;assets" --collect-all game.card --console main.py
 
       - name: Build on Linux
         if: matrix.os == 'ubuntu-latest'
         run: |
           pip install pygame
-          pyinstaller --onefile --name doudizhu --add-data "assets:assets" --console main.py
+          pyinstaller --onefile --name doudizhu --add-data "assets:assets" --collect-all game.card --console main.py
 
       - name: Build on macOS
         if: matrix.os == 'macos-latest'
         run: |
           pip install pygame
-          pyinstaller --onefile --name doudizhu --add-data "assets:assets" --console main.py
+          pyinstaller --onefile --name doudizhu --add-data "assets:assets" --collect-all game.card --console main.py
 
       - name: Package Windows
         if: matrix.os == 'windows-latest'
@@ -124,5 +124,6 @@ jobs:
             artifacts/doudizhu-macos.tar.gz
             artifacts/checksums.txt
           generate_release_notes: true
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
