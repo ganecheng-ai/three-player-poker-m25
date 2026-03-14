@@ -37,10 +37,10 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-构建产物包括：
-- Windows: `.exe` / `.zip`
-- macOS: `.tar.gz`
-- Linux: `.tar.gz`
+构建产物命名格式（包含版本号和CPU架构）：
+- Windows: `doudizhu-v版本号-windows-x64.zip`
+- macOS: `doudizhu-v版本号-macos-x64.tar.gz`
+- Linux: `doudizhu-v版本号-linux-x64.tar.gz`
 - 包含 SHA256 校验和文件 `checksums.txt`
 
 ## 项目结构
