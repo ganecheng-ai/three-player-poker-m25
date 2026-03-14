@@ -22,13 +22,16 @@
    - Windows (windows-latest)
    - Linux (ubuntu-latest)
    - macOS (macos-latest)
-
-2. **文件命名与后缀规范**：
-   生成的构建产物（Artifacts）必须遵循开源社区典型命名规范，包含操作系统和架构信息，并使用标准后缀：
-   - **Windows**: `.exe` (可执行文件) 或 `.zip` (压缩包)
-   - **Linux**: `.tar.gz` (通用), `.deb` (Debian/Ubuntu), 或 `.AppImage`
-   - **macOS**: `.dmg` (磁盘镜像) 或 `.tar.gz` (包含 .app)
+2. **文件命名与后缀规范**：生成的构建产物（Artifacts）必须遵循开源社区典型命名规范，包含操作系统和CPU架构信息，并使用标准后缀：
+   - **Windows**: `仓库名称-版本号-操作系统-CPU架构.exe`
+   - **Linux**: `仓库名称-版本号-操作系统-CPU架构.tar.gz`
+   - **macOS**: `仓库名称-版本号-操作系统-CPU架构.dmg`
    - **通用**: 请同时生成一个 `checksums.txt` 文件包含所有文件的 SHA256 哈希值。
+3. **更新内容介绍**：更新内容需要介绍两个版本之间的变化:
+   - 亮点介绍
+   - 新增功能
+   - 优化改进
+   - 问题修复
 
 # 问题修复
 - 修复打开中的issue并关闭, 及时发布新版本, 在issue里回复哪个版本已修复并提供新版本下载地址, 提醒用户进行验证.
