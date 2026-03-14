@@ -7,7 +7,8 @@ from config import (
     COLOR_WHITE, COLOR_BLACK, COLOR_BUTTON, COLOR_BUTTON_HOVER,
     SCREEN_WIDTH, SCREEN_HEIGHT, CARD_WIDTH, CARD_HEIGHT
 )
-from game.card import Card, Suit
+from game.card import Card
+from game.card import Suit as CardSuit
 from ui.resources import resources
 
 
@@ -90,7 +91,9 @@ class CardWidget:
             small_font = resources.font_small
             rank_suit = small_font.render(f"{rank_text}", True, self.card.color)
             suit_name = {0: '♠', 1: '♥', 2: '♣', 3: '♦', 4: 'JOKER'}
-            suit_text = suit_name.get(self.card.suit.value, '')
+            # 获取花色值，兼容打包后的情况
+            suit_val = self.card.suit.value if hasattr(self.card.suit, 'value') else self.card.suit
+            suit_text = suit_name.get(suit_val, '')
 
             # 左上角
             screen.blit(rank_suit, (self.x + 5, card_y + 5))
@@ -102,7 +105,8 @@ class CardWidget:
             screen.blit(rank_surf_r, (self.x + CARD_WIDTH - 25, card_y + CARD_HEIGHT - 25))
 
             # 中心花色
-            if self.card.suit.value != 4:  # 4 is JOKER
+            # 兼容打包后的情况，JOKER的花色值为4
+            if suit_val != 4:  # 4 is JOKER
                 center_suit = resources.font_large.render(suit_text, True, self.card.color)
                 center_rect = center_suit.get_rect(center=(self.x + CARD_WIDTH//2, card_y + CARD_HEIGHT//2))
                 screen.blit(center_suit, center_rect)

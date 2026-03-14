@@ -2,6 +2,7 @@
 """游戏界面"""
 
 import pygame
+import time
 from typing import Optional, List
 from config import (
     SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -14,6 +15,7 @@ from game.card import Card
 from game.game_controller import GameController
 from ui.resources import resources
 from ui.widgets import Button, CardWidget, PlayerInfo, MessageBox
+from utils.logger import logger
 
 
 class GameScreen:
@@ -23,6 +25,8 @@ class GameScreen:
         self.game = GameController()
         self.selected_cards: List[Card] = []
         self.message: Optional[MessageBox] = None
+        self.last_ai_play_time = 0
+        self.ai_play_delay = 1000  # AI出牌延迟（毫秒）
 
         # 按钮
         self.buttons = {
@@ -35,6 +39,18 @@ class GameScreen:
             'restart': Button(SCREEN_WIDTH // 2 - 80, SCREEN_HEIGHT // 2 + 80, 160, 50,
                             "再来一局", self.on_start_game),
         }
+
+    def update(self):
+        """更新游戏状态，处理AI自动出牌"""
+        if self.game.state == STATE_PLAYING:
+            current_player = self.game.get_current_player()
+            # 如果是AI玩家且当前回合不是玩家（人类玩家需要手动出牌）
+            if current_player.is_ai and current_player.player_id != PLAYER_BOTTOM:
+                current_time = pygame.time.get_ticks()
+                # 检查是否需要AI出牌（添加延迟避免瞬间出牌）
+                if current_time - self.last_ai_play_time > self.ai_play_delay:
+                    self._ai_play_cards(current_player)
+                    self.last_ai_play_time = current_time
 
     def on_start_game(self):
         """开始游戏"""
@@ -62,6 +78,24 @@ class GameScreen:
             return
         self.game.player_play_cards(PLAYER_BOTTOM, [])
         self.selected_cards = []
+
+    def _ai_play_cards(self, ai_player):
+        """AI自动出牌"""
+        # 获取上家出的牌
+        last_cards = self.game.last_cards
+        last_player_id = self.game.last_player_id if self.game.last_player_id is not None else -1
+
+        # 获取AI可出的牌
+        cards_to_play = ai_player.choose_cards_to_play(last_player_id, last_cards, self.game.play_history)
+
+        # 检查是否能出牌
+        if cards_to_play and self.game.can_play_cards(ai_player.player_id, cards_to_play):
+            self.game.player_play_cards(ai_player.player_id, cards_to_play)
+            logger.info(f"AI {ai_player.name} 出牌: {[str(c) for c in cards_to_play]}")
+        else:
+            # AI过牌
+            self.game.player_play_cards(ai_player.player_id, [])
+            logger.info(f"AI {ai_player.name} 过牌")
 
     def draw(self):
         """绘制游戏界面"""

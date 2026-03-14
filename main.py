@@ -35,6 +35,9 @@ def main():
             else:
                 game_screen.handle_event(event)
 
+        # 更新游戏状态（处理AI出牌）
+        game_screen.update()
+
         # 绘制
         game_screen.draw()
         resources.flip()
