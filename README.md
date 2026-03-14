@@ -19,7 +19,13 @@
 ## 安装依赖
 
 ```bash
-pip install pygame
+pip install -r requirements.txt
+```
+
+或者单独安装:
+
+```bash
+pip install pygame pillow
 ```
 
 ## 运行游戏
