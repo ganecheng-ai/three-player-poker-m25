@@ -11,6 +11,7 @@ from utils.logger import logger
 def main():
     """主函数"""
     # 初始化
+    pygame.init()
     logger.info("游戏启动")
     resources.load_fonts()
     resources.init_screen()
