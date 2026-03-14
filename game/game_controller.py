@@ -12,6 +12,15 @@ from config import (
 )
 from utils.logger import logger
 
+# 叫地主回调函数（供UI调用）
+_on_landlord_called = None
+
+
+def set_landlord_callback(callback):
+    """设置叫地主回调"""
+    global _on_landlord_called
+    _on_landlord_called = callback
+
 
 class GameController:
     """游戏控制器"""
@@ -103,6 +112,11 @@ class GameController:
                 # 获得底牌
                 player.receive_cards(self.landlord_cards)
                 logger.info(f"{player.name} 成为地主，获得底牌: {self.landlord_cards}")
+
+                # 通知UI
+                global _on_landlord_called
+                if _on_landlord_called:
+                    _on_landlord_called(player.player_id, True)
                 break
         else:
             # 都没叫，重新发牌

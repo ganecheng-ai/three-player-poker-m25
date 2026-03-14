@@ -15,6 +15,8 @@ from game.card import Card
 from game.game_controller import GameController
 from ui.resources import resources
 from ui.widgets import Button, CardWidget, PlayerInfo, MessageBox
+from ui.animation import animation_manager
+from ui.sound_manager import sound_manager
 from utils.logger import logger
 
 
@@ -27,6 +29,10 @@ class GameScreen:
         self.message: Optional[MessageBox] = None
         self.last_ai_play_time = 0
         self.ai_play_delay = 1000  # AI出牌延迟（毫秒）
+
+        # 注册叫地主回调
+        from game.game_controller import set_landlord_callback
+        set_landlord_callback(self._on_landlord_called)
 
         # 按钮
         self.buttons = {
@@ -42,6 +48,9 @@ class GameScreen:
 
     def update(self):
         """更新游戏状态，处理AI自动出牌"""
+        # 更新动画
+        animation_manager.update()
+
         if self.game.state == STATE_PLAYING:
             current_player = self.game.get_current_player()
             # 如果是AI玩家且当前回合不是玩家（人类玩家需要手动出牌）
@@ -52,11 +61,27 @@ class GameScreen:
                     self._ai_play_cards(current_player)
                     self.last_ai_play_time = current_time
 
+    def _on_landlord_called(self, player_id: int, is_landlord: bool):
+        """叫地主回调"""
+        # 播放叫地主音效
+        sound_manager.play('call_landlord')
+        # 创建叫地主动画
+        animation_manager.create_call_landlord_animation(player_id, is_landlord)
+
     def on_start_game(self):
         """开始游戏"""
         self.game.start_new_game()
         self.selected_cards = []
         self.message = MessageBox("游戏开始!")
+        # 播放发牌音效
+        sound_manager.play('deal')
+        # 创建发牌动画
+        animation_manager.create_deal_animation(
+            cards=[],
+            from_pos=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2),
+            to_pos=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2),
+            duration=0.3
+        )
 
     def on_play_cards(self):
         """出牌"""
@@ -66,6 +91,14 @@ class GameScreen:
 
         player = self.game.players[PLAYER_BOTTOM]
         if self.game.can_play_cards(PLAYER_BOTTOM, self.selected_cards):
+            # 播放出牌音效
+            if len(self.selected_cards) == 4:
+                sound_manager.play('bomb')
+            elif len(self.selected_cards) == 2 and self.selected_cards[0].rank == self.selected_cards[1].rank:
+                sound_manager.play('rocket')
+            else:
+                sound_manager.play('play_card')
+
             self.game.player_play_cards(PLAYER_BOTTOM, self.selected_cards)
             self.selected_cards = []
         else:
@@ -76,6 +109,8 @@ class GameScreen:
         if self.game.last_cards is None or self.game.last_player_id != PLAYER_BOTTOM:
             self.message = MessageBox("你是首家，不能过!")
             return
+        # 播放过牌音效
+        sound_manager.play('pass')
         self.game.player_play_cards(PLAYER_BOTTOM, [])
         self.selected_cards = []
 
@@ -92,10 +127,16 @@ class GameScreen:
         if cards_to_play and self.game.can_play_cards(ai_player.player_id, cards_to_play):
             self.game.player_play_cards(ai_player.player_id, cards_to_play)
             logger.info(f"AI {ai_player.name} 出牌: {[str(c) for c in cards_to_play]}")
+            # 播放出牌音效
+            if len(cards_to_play) == 4:
+                sound_manager.play('bomb')
+            else:
+                sound_manager.play('play_card')
         else:
             # AI过牌
             self.game.player_play_cards(ai_player.player_id, [])
             logger.info(f"AI {ai_player.name} 过牌")
+            sound_manager.play('pass')
 
     def draw(self):
         """绘制游戏界面"""
@@ -103,6 +144,9 @@ class GameScreen:
 
         # 背景
         resources.fill_background(COLOR_GREEN_DARK)
+
+        # 绘制动画效果
+        animation_manager.draw(screen)
 
         if self.game.state == STATE_MENU:
             self._draw_menu(screen)
@@ -234,6 +278,24 @@ class GameScreen:
                     f"{winner.name} {result}", 'large', color)
                 rect = result_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 30))
                 screen.blit(result_text, rect)
+
+                # 首次进入游戏结束状态时播放音效和动画
+                if not hasattr(self, '_game_over_played') or not self._game_over_played:
+                    self._game_over_played = True
+                    if winner.player_id == PLAYER_BOTTOM:
+                        if winner.is_landlord:
+                            sound_manager.play('win')
+                            animation_manager.create_win_animation(winner.name)
+                        else:
+                            sound_manager.play('win')  # 农民赢也是胜利
+                            animation_manager.create_win_animation(winner.name)
+                    else:
+                        sound_manager.play('lose')
+                        animation_manager.create_lose_animation()
+        else:
+            # 重置游戏结束标志
+            if hasattr(self, '_game_over_played'):
+                self._game_over_played = False
 
     def handle_event(self, event) -> bool:
         """处理事件"""
