@@ -102,7 +102,7 @@ class CardWidget:
             screen.blit(rank_surf_r, (self.x + CARD_WIDTH - 25, card_y + CARD_HEIGHT - 25))
 
             # 中心花色
-            if self.card.suit != Suit.JOKER:
+            if self.card.suit.value != 4:  # 4 is JOKER
                 center_suit = resources.font_large.render(suit_text, True, self.card.color)
                 center_rect = center_suit.get_rect(center=(self.x + CARD_WIDTH//2, card_y + CARD_HEIGHT//2))
                 screen.blit(center_suit, center_rect)
