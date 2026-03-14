@@ -67,22 +67,31 @@ jobs:
         working-directory: dist
         shell: powershell
         run: |
-          Compress-Archive -Path doudizhu.exe -DestinationPath doudizhu-windows.zip
-          Move-Item doudizhu-windows.zip ../
+          $version = "${{ github.ref_name }}"
+          $arch = "x64"
+          $filename = "doudizhu-$version-windows-$arch.zip"
+          Compress-Archive -Path doudizhu.exe -DestinationPath $filename
+          Move-Item $filename ../
 
       - name: Package Linux
         if: matrix.os == 'ubuntu-latest'
         working-directory: dist
         run: |
-          tar -czvf doudizhu-linux.tar.gz doudizhu
-          mv doudizhu-linux.tar.gz ../
+          version="${{ github.ref_name }}"
+          arch="x64"
+          filename="doudizhu-$version-linux-$arch.tar.gz"
+          tar -czvf $filename doudizhu
+          mv $filename ../
 
       - name: Package macOS
         if: matrix.os == 'macos-latest'
         working-directory: dist
         run: |
-          tar -czvf doudizhu-macos.tar.gz doudizhu
-          mv doudizhu-macos.tar.gz ../
+          version="${{ github.ref_name }}"
+          arch="x64"
+          filename="doudizhu-$version-macos-$arch.tar.gz"
+          tar -czvf $filename doudizhu
+          mv $filename ../
 
       - name: Clean up build artifacts
         run: python -c "import os, shutil, glob; [os.remove(p) for f in ['*.log', '*.spec'] for p in glob.glob(f) if os.path.exists(p)]; [shutil.rmtree(d) for d in ['build', 'dist', '__pycache__'] if os.path.exists(d)]"
@@ -96,6 +105,8 @@ jobs:
             doudizhu
             doudizhu*.tar.gz
             doudizhu*.zip
+            doudizhu-v*.tar.gz
+            doudizhu-v*.zip
           retention-days: 5
 
   release:
@@ -124,8 +135,8 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: |
-            artifacts/doudizhu*.zip
-            artifacts/doudizhu*.tar.gz
+            artifacts/doudizhu-v*.zip
+            artifacts/doudizhu-v*.tar.gz
             checksums.txt
           allowUpdates: true
           draft: false
